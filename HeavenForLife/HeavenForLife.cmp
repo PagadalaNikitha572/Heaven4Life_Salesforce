@@ -1,0 +1,389 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="Haven4Life">
+    <aura:attribute name="selectedItem" type="String" default="None" />
+    <aura:attribute name="volunteerRecDetails" type="Object[]" />
+	<aura:attribute name="shelterRecDetails" type="Object[]" />
+    <aura:attribute name="donatorRecDetails" type="Object[]" />
+    <aura:attribute name="refugeeRecDetails" type="Object[]" />
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="selectedValue" type="String" />
+    <aura:attribute name="selectedUnshelteredId" type="String" />
+    <aura:attribute name="profileName" type="String" />
+    <aura:attribute name="loggedInUserProfile" type="String" />
+    <aura:attribute name="isDonateModel" type="boolean" default="false"/>
+    <aura:attribute name="amountDonated" type="Decimal" />
+    <aura:attribute name="isReceiptModel" type="boolean" default="false"/>
+    <aura:attribute name="donationReceiptDetails" type="Object[]" />
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+    
+    <div style="background-color:white;min-width: 225px; border-right: 1px solid #e7e7e7;padding-bottom: 10px;">
+        <lightning:layout>
+            <lightning:layoutItem>
+                <lightning:verticalNavigation selectedItem="{! v.selectedItem }" onselect="{! c.handleSelect }" class="navigation">
+                    <lightning:verticalNavigationSection label="ALL">
+                        <lightning:verticalNavigationItemIcon label="About" name="folders_About" icon-name="utility:open_folder"></lightning:verticalNavigationItemIcon>
+                        <lightning:verticalNavigationItemIcon label="Shelters" name="folders_Shelters" icon-name="utility:open_folder"></lightning:verticalNavigationItemIcon>
+                        <lightning:verticalNavigationItemIcon label="Volunteers" name="folders_Volunteers" icon-name="utility:open_folder"></lightning:verticalNavigationItemIcon>
+                        <lightning:verticalNavigationItemIcon label="UnSheltered People" name="folders_UnSheltered" icon-name="utility:open_folder"></lightning:verticalNavigationItemIcon>
+                        <lightning:verticalNavigationItemIcon label="Donations" name="folders_Donations" icon-name="utility:open_folder"></lightning:verticalNavigationItemIcon>
+                    </lightning:verticalNavigationSection>
+                </lightning:verticalNavigation>
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-medium" class="widthStyle">
+                <aura:if isTrue="{!v.selectedItem == 'folders_About'}">
+                    <div style="padding: 40px;">
+                        <p style="padding-bottom: 10px;">This is a website to help people.</p>
+                        <p style="padding-bottom: 10px;">Haven4Life is a Salesforce-based application dedicated to supporting volunteering efforts, registering homeless individuals and orphans, and facilitating adoption services</p>
+                        <p style="padding-bottom: 10px;">Our mission is to streamline operations, enhance service delivery, and improve client outcomes through efficient volunteer management, centralized client registration, seamless adoption services, and insightful data analytics. </p>
+                        <p>Join us in creating a compassionate community where everyone receives the care and support they deserve.</p>
+                	</div>
+                </aura:if>
+                <aura:if isTrue="{!v.selectedItem == 'folders_Shelters'}">
+                    <lightning:layout multipleRows="true" class="slds-m-around_medium slds-scrollable_y">
+                        <aura:iteration items="{!v.shelterRecDetails}" var="object" indexVar="index">
+                            <lightning:layoutItem size="6">
+                                <div class="cardStyle">
+                                    <lightning:layout>
+                                        <lightning:layoutItem size="4">
+                                            <img src="{!object.Image__c}" alt="Image" class="icon"/>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="8">
+                                            <header class="slds-card__header">
+                                            <h3 class="slds-text-heading_small">{!object.Name}</h3>
+                                            <div class="title-line"></div>
+                                        </header>
+                                        <div class="slds-card__body">
+                                            <p class="slds-p-horizontal_small">
+                                                <strong>Name :</strong>&nbsp;&nbsp;{!object.Name}<br/>
+                                                <strong>Phone Number :</strong>&nbsp;&nbsp;{!object.Phone_number__c}<br/>
+                                                <strong>Vaccancies :</strong>&nbsp;&nbsp;{!object.Vancancies__c}
+                                            </p>
+                                        </div>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </lightning:layout>
+                </aura:if>
+                <aura:if isTrue="{!v.selectedItem == 'folders_Volunteers'}">
+                    <lightning:layout multipleRows="true" class="slds-m-around_medium slds-scrollable_y">
+                        <aura:iteration items="{!v.volunteerRecDetails}" var="object" indexVar="index">
+                        	<lightning:layoutItem size="6">
+                                <div class="cardStyle">
+                                    <lightning:layout>
+                                        <lightning:layoutItem size="3">
+                                            <img src="{!object.Image__c}" alt="Image" class="icon1"/>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="9">
+                                            <header class="slds-card__header">
+                                            <h3 class="slds-text-heading_small">{!object.Name}</h3>
+                                            <div class="title-line"></div>
+                                        </header>
+                                        <div class="slds-card__body">
+                                            <p class="slds-p-horizontal_small">
+                                                <strong>Name :</strong>&nbsp;&nbsp;{!object.Name}<br/>
+                                                <strong>Phone Number :</strong>&nbsp;&nbsp;{!object.Phone_number__c}<br/>
+                                                <strong>Email :</strong>&nbsp;&nbsp;{!object.Email__c}
+                                            </p>
+                                        </div>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </lightning:layout>
+                </aura:if>
+                <aura:if isTrue="{!v.selectedItem == 'folders_UnSheltered'}">
+                    <lightning:layout multipleRows="true" class="slds-m-around_medium slds-scrollable_y">
+                        <aura:iteration items="{!v.refugeeRecDetails}" var="object" indexVar="index">
+                        	<lightning:layoutItem size="6">
+                                <div class="cardStyle">
+                                    <lightning:layout>
+                                        <lightning:layoutItem size="3">
+                                            <img src="{!object.Image__c}" alt="Image" class="icon2"/>
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="9">
+                                            <header class="slds-card__header">
+                                                <h3 class="slds-text-heading_small">{!object.Name}</h3>
+                                                <div class="title-line"></div>
+                                            </header>
+                                            <div class="slds-card__body">
+                                                <p class="slds-p-horizontal_small" style="padding-bottom:10px;">
+                                                    <strong>Name :</strong>&nbsp;&nbsp;{!object.Name}<br/>
+                                                    <strong>Phone Number :</strong>&nbsp;&nbsp;{!object.Phone_number__c}<br/>
+                                                    <strong>Email :</strong>&nbsp;&nbsp;{!object.Email__c}
+                                                </p>
+                                                <aura:if isTrue="{!v.loggedInUserProfile != 'Guest User'}">
+                                                    <div class="slds-border_top" style="padding:10px;text-align:right;margin-right:5px;">
+                                                        <lightning:button name="{!object.Id}" variant="Neutral" label="Assign" title="Assign" onclick="{! c.assignShelter}"/>
+                                                    </div>
+                                                </aura:if>
+                                            </div>
+                                        </lightning:layoutItem>
+                                    </lightning:layout>
+                                </div>
+                            </lightning:layoutItem>
+                        </aura:iteration>
+                    </lightning:layout>
+                </aura:if>
+                <aura:if isTrue="{!v.selectedItem == 'folders_Donations'}">
+                    <aura:if isTrue="{!v.loggedInUserProfile == 'Guest User'}">
+                        <div style="padding-top:10px;text-align:right;">
+                            <lightning:button variant="Neutral" label="Receipt" title="Receipt" onclick="{! c.openReceiptModel}"/>
+                        </div>
+                        <img src="{!$Resource.donate}" alt="Image" style="width: -webkit-fill-available;height: 300px;padding-left:20%;padding-right:20%"/>
+                        <div style="padding-top:10px;text-align:center;">
+                            <lightning:button variant="Neutral" label="Donate" title="Donate" onclick="{! c.openDonateModel}"/>
+                        </div>
+                        <aura:set attribute="else">
+                           <div>
+                               <p style="font-weight:bold;padding-bottom:10px;font-size:16px;">Donations Received:</p>
+                               <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                                   <thead>
+                                       <tr class="slds-line-height_reset">
+                                           <th class="" scope="col">
+                                               <div class="slds-truncate" title="serial No">S.no</div>
+                                           </th>
+                                           <th class="" scope="col">
+                                               <div class="slds-truncate" title="Donator Name">Donator Name</div>
+                                           </th>
+                                           <th class="" scope="col">
+                                               <div class="slds-truncate" title="City">City</div>
+                                           </th>
+                                           <th class="" scope="col">
+                                               <div class="slds-truncate" title="Shelter">Shelter Name</div>
+                                           </th>
+                                           <th class="" scope="col">
+                                               <div class="slds-truncate" title="Amount">Amount</div>
+                                           </th>
+                                       </tr>
+                                   </thead>
+                                   <tbody>
+                                       <aura:iteration items="{!v.donatorRecDetails}" var="donatorRec" indexVar="index">
+                                           <tr class="slds-hint-parent">
+                                               <td data-label="Serial No">
+                                                   <div class="slds-truncate" title="Serial No">{!index + 1}</div>
+                                               </td>
+                                               <td data-label="Donator Name">
+                                                   <div class="slds-truncate" title="Name">{!donatorRec.Name}</div>
+                                               </td>
+                                               <td data-label="City">
+                                                   <div class="slds-truncate" title="City">{!donatorRec.City__c}</div>
+                                               </td>
+                                               <td data-label="Shelter">
+                                                   <div class="slds-truncate" title="Shelter">{!donatorRec.Shelter_Id__r.Name}</div>
+                                               </td>
+                                               <td data-label="Amount">
+                                                   <div class="slds-truncate" title="Amount">{!donatorRec.Amount__c}</div>
+                                               </td>
+                                           </tr>
+                                       </aura:iteration>
+                                   </tbody>
+                               </table>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+        
+        <aura:if isTrue="{!v.isModalOpen}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box</h2>
+                    </header>
+                    <!--	Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:layout multipleRows="true" class="slds-m-around_medium">
+                            <lightning:layoutItem size="12" class="slds-p-horizontal_small">
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-3">
+                                        <lightning:formattedText value="Select an Option:" class="slds-form-element__label"/>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-3">
+                                        <lightning:select name="picklist" label="Picklist" value="{!v.selectedValue}" onchange="{!c.handlePicklistChange}">
+                                            <aura:iteration items="{!v.shelterRecDetails}" var="value">
+                                                <option value="{!value.Id}">{!value.Name}</option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        <lightning:button variant="brand"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{!c.submitDetails}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.isDonateModel}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Donation</h2>
+                    </header>
+                    <!--	Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:layout multipleRows="true" class="slds-m-around_medium">
+                            <lightning:layoutItem size="12" class="slds-p-horizontal_small">
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-3" style="padding-top: 25px;">
+                                        <lightning:formattedText value="Select a Shelter Home:" class="slds-form-element__label"/>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-3">
+                                        <lightning:select value="{!v.selectedValue}" onchange="{!c.handlePicklistChange}">
+                                            <aura:iteration items="{!v.shelterRecDetails}" var="value">
+                                                <option value="{!value.Id}">{!value.Name}</option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-3" style="padding-top: 25px;">
+                                        <lightning:formattedText value="Card Number: " class="slds-form-element__label"/>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-3">
+                                        <lightning:input type="number" name="Card Number" placeholder="enter the number..."/>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_6-of-12" style="display: flex;">
+                                        <lightning:formattedText value="CVV: " class="slds-form-element__label textStyle"/>
+                                        <lightning:input type="number" name="CVV" placeholder="enter the CVV..."/>
+                                    </div>
+                                    <div class="slds-col slds-size_6-of-12" style="display: flex;">
+                                        <lightning:formattedText value="Expiry Date: " class="slds-form-element__label textStyle"/>
+                                        <lightning:input type="string" name="Expiry Date" placeholder="enter the date(MM/YYYY)..."/>
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-3" style="padding-top: 22px;">
+                                        <lightning:formattedText value="Amount to Danate:" class="slds-form-element__label "/>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-3">
+                                        <lightning:input type="number" name="Donation Amount" value="{! v.amountDonated }" placeholder="enter the amount..." onchange="{!c.handleAmountChange}"/>
+                                    </div>
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        <lightning:button variant="brand"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{!c.submitDonationDetails}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.isReceiptModel}">
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Receipt Details</h2>
+                    </header>
+                    <!--	Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:layout multipleRows="true" class="slds-m-around_medium">
+                            <lightning:layoutItem size="12" class="slds-p-horizontal_small">
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-3">
+                                        <lightning:formattedText value="Shelter Home:" class="slds-form-element__label"/>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-3">
+                                        {!v.selectedValue}
+                                    </div>
+                                </div>
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-3">
+                                        <lightning:formattedText value="Amount Danated:" class="slds-form-element__label "/>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-3">
+                                        {! v.amountDonated}
+                                    </div>
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{!c.closeModel}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+    
+    <lightning:carousel disableAutoRefresh="false" disableAutoScroll="false">
+        <lightning:carouselImage
+            src="{!$Resource.carousel1}"
+            header="We are...."
+            description="Safe home for people who need."
+            alternativeText="Safe home for people who need."
+            href="https://www.salesforce.com"
+            class="custom-carousel-image">
+        </lightning:carouselImage>
+        <lightning:carouselImage
+            src="{!$Resource.carousel2}"
+            header="We would like to...."
+            description="Eradicate homelessness in the world."
+            alternativeText="Eradicate homelessness in the world."
+            href="https://www.salesforce.com"
+            class="custom-carousel-image">
+        </lightning:carouselImage>
+        <lightning:carouselImage
+            src="{!$Resource.carousel3}"
+            header="You can help us...."
+            description="By applying to be a volunteer or donate for our cause."
+            alternativeText="By applying to be a volunteer or donate for our cause."
+            href="https://www.salesforce.com"
+            class="custom-carousel-image">
+        </lightning:carouselImage>
+    </lightning:carousel>
+</aura:component>
